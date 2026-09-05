@@ -64,9 +64,3 @@ pip install -r requirements.txt
 * Launch Jupyter: `jupyter notebook`
 * Run `data_preparing.ipynb` first to generate the `prepared_data.csv` file in the `data/` directory.
 * Run `regression.ipynb` to train the models and output the evaluation metrics.
-
-
-
-## 📝 License
-
-This project is open-source and available under the [MIT License](https://www.google.com/search?q=LICENSE).
