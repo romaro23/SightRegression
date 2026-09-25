@@ -1,72 +1,62 @@
-# Machine Learning for Uncorrected Visual Acuity Evaluation
+# Регресійні моделі для прогнозування гостроти зору
 
-## 📌 Overview
-This project focuses on predicting uncorrected visual acuity using clinical ophthalmological data. By leveraging various machine learning regression algorithms and feature selection techniques, the goal is to provide an accurate, automated evaluation of patient vision metrics.
+## 📌 Огляд
+Метою даного проєкту є розробка та порівняльний аналіз регресійних моделей для прогнозування некорегованої гостроти зору вдалину на основі реального офтальмологічного набору даних. Шляхом застосування методів машинного навчання (ансамблі дерев рішень, лінійна регресія з регуляризацією, штучні нейронні мережі) та стабільного відбору ознак (зменшення простору ознак із 130 до 8 найбільш значущих), проєкт забезпечує точне та автоматизоване оцінювання візуальних метрик пацієнтів з мінімізацією ефекту перенавчання.
 
-## 🛠 Tech Stack
-* **Language:** Python
-* **Libraries:** Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn
-* **Environment:** Jupyter Notebook
+## 🛠 Технологічний стек
+* **Мова програмування:** Python
+* **Бібліотеки:** Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn
+* **Середовище:** Jupyter Notebook / PyCharm
 
-## 📂 Project Structure
+## 📂 Структура проєкту
 ```text
 ├── data/
-│   ├── data.csv              # Raw clinical data
-│   ├── age.csv               # Patient age data
-│   ├── merged_data.csv       # Intermediate merged dataset
-│   └── prepared_data.csv     # Final cleaned and processed dataset ready for training
-├── data_preparing.ipynb      # Notebook for data cleaning, merging, and preprocessing
-├── regression.ipynb          # Notebook for model training, evaluation, and tuning
-└── requirements.txt          # Project dependencies
-
+│   ├── data.csv              # Сирі клінічні дані
+│   ├── age.csv               # Дані про вік пацієнтів
+│   ├── merged_data.csv       # Проміжний об'єднаний датасет
+│   └── prepared_data.csv     # Очищений датасет, готовий до використання
+├── data_preparing.ipynb      # Ноутбук для очищення, об'єднання датасетів та препроцесингу
+├── regression.ipynb          # Ноутбук тренування, налаштування гіперпараметрів та оцінки моделей
+└── requirements.txt          # Залежності проєкту
 ```
 
-## 📊 Dataset & Preprocessing
+## 📊 Дані та препроцесинг
+Пайплайн підготовки даних реалізовано у `data_preparing.ipynb`. Основні кроки:
+1. **Інтеграція даних:** Об'єднання сирих клінічних вимірювань (`data.csv`) з демографічними параметрами (`age.csv`).
+2. **Очищення та імпутація:** Обробка пропущених значень (SimpleImputer), видалення викидів (через IsolationForest) та стандартизація метрик.
+3. **Вибір та зменшення розмірності:** Застосування методів PCA та RFECV. У фінальній моделі реалізовано алгоритм стабільного відбору ознак, завдяки якому виділено 8 найбільш значущих офтальмологічних параметрів із 130.
 
-The data pipeline is documented in `data_preparing.ipynb`. Key steps include:
+## 🧠 Методологія та Моделі
+У посібнику `regression.ipynb` досліджуються та порівнюються кілька підходів для знаходження оптимальної моделі:
+* **Random Forest Regressor** (Ансамбль дерев рішень)
+* **MLPRegressor** (Штучна нейронна мережа)
+* **ElasticNet** (Регресія з L1/L2 регуляризацією)
 
-1. **Data Integration:** Merging raw clinical measurements (`data.csv`) with demographic data (`age.csv`).
-2. **Cleaning & Imputation:** Handling missing values, removing outliers (e.g., via IsolationForest), and normalizing clinical metrics.
-3. **Feature Engineering & Selection:** Utilizing techniques like **PCA (Principal Component Analysis)** and **RFECV (Recursive Feature Elimination with Cross-Validation)** to reduce dimensionality while preserving predictive power.
+Для підбору гіперпараметрів використовувався `RandomizedSearchCV` із груповою крос-валідацією (`GroupKFold`).
 
-## 🧠 Methodology & Models
-
-The `regression.ipynb` notebook explores and compares multiple regression models to find the optimal fit for the clinical data:
-
-* **ElasticNet**
-* **Random Forest Regressor**
-* **MLPRegressor (Multi-Layer Perceptron)**
-
-| Model | MAE | RMSE | R² Score |
+### Порівняння метрик на тестовій вибірці (Топ 8 ознак)
+| Модель | R² Score | MAE | RMSE |
 | --- | --- | --- | --- |
-| Random Forest | 0.078 | 0.171 | 0.625 |
-| MLPRegressor | 0.00 | 0.00 | 0.497 |
-| ElasticNet | 0.00 | 0.00 | 0.273 |
+| Random Forest (Фінальна) | 0.625 | 0.078 | 0.171 |
+| MLPRegressor | 0.497 | ~0.105* | ~0.198* |
+| ElasticNet | 0.273 | ~0.134* | ~0.231* |
 
-## 🚀 How to Run
+*\*Примітка: для MLPRegressor та ElasticNet вказані приблизні оцінки абсолютних помилок, оскільки під час пошуку оптимальної конфігурації у ноутбуці фіксувався переважно R² Score.*
 
-1. **Clone the repository:**
+## 🚀 Як запустити
+
+1. **Клонуйте репозиторій:**
 ```bash
-git clone [https://github.com/romaro23/SightRegression.git](https://github.com/romaro23/SightRegression.git)
+git clone https://github.com/romaro23/SightRegression.git
 cd SightRegression
-
 ```
 
-
-2. **Install dependencies:**
+2. **Встановіть залежності:**
 ```bash
 pip install -r requirements.txt
-
 ```
 
-
-3. **Execute the pipeline:**
-* Launch Jupyter: `jupyter notebook`
-* Run `data_preparing.ipynb` first to generate the `prepared_data.csv` file in the `data/` directory.
-* Run `regression.ipynb` to train the models and output the evaluation metrics.
-
-
-
-## 📝 License
-
-This project is open-source and available under the [MIT License](https://www.google.com/search?q=LICENSE).
+3. **Запустіть пайплайн:**
+* Відкрийте Jupyter: `jupyter notebook`
+* Спочатку виконайте `data_preparing.ipynb` для генерації файлу `prepared_data.csv` у директорії `data/`.
+* Далі запустіть `regression.ipynb` для тренування моделей, їх оцінки та побудови графіків результатів.
